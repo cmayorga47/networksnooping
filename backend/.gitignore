@@ -1,6 +1,15 @@
-# .gitignore
+# Ignore virtual environments
 venv/
+snmpsim-env-py311/
+.env/
 __pycache__/
 *.pyc
+*.pyo
+*.dbm
 .DS_Store
-.env
+snmpsim-venv/
+
+
+# VSCode or PyCharm config (optional)
+.vscode/
+.idea/
