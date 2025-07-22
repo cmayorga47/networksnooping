@@ -1,21 +1,46 @@
-# terminal_test_snmp.py
-from pysnmp.hlapi import *
+from pysnmp.hlapi import (
+    getCmd, SnmpEngine, CommunityData,
+    UdpTransportTarget, ContextData,
+    ObjectType, ObjectIdentity
+)
 
-for (errorIndication,
-     errorStatus,
-     errorIndex,
-     varBinds) in getCmd(
-         SnmpEngine(),
-         CommunityData('demo'),  # Make sure this matches your .snmprec community
-         UdpTransportTarget(('127.0.0.1', 1161)),
-         ContextData(),
-         ObjectType(ObjectIdentity('1.3.6.1.2.1.1.1.0'))  # sysDescr OID
-     ):
+def snmp_get(oid, target=('127.0.0.1', 1161), community='demo'):
+    iterator = getCmd(
+        SnmpEngine(),
+        CommunityData(community),
+        UdpTransportTarget(target),
+        ContextData(),
+        ObjectType(ObjectIdentity(oid))
+    )
+
+    errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
 
     if errorIndication:
-        print(f"Error: {errorIndication}")
+        return {oid: f"Error: {errorIndication}"}
     elif errorStatus:
-        print(f'{errorStatus.prettyPrint()} at {errorIndex and varBinds[int(errorIndex) - 1][0] or "?"}')
+        return {oid: f"{errorStatus.prettyPrint()} at {errorIndex}"}
     else:
-        for varBind in varBinds:
-            print(f'{varBind[0]} = {varBind[1]}')
+        return {str(varBind[0]): str(varBind[1]) for varBind in varBinds}
+
+
+def test_snmp_all():
+    oids = [
+        '1.3.6.1.2.1.1.1.0',        # sysDescr
+        '1.3.6.1.2.1.1.2.0',        # sysObjectID
+        '1.3.6.1.2.1.1.3.0',        # sysUpTime
+        '1.3.6.1.2.1.1.4.0',        # sysContact
+        '1.3.6.1.2.1.1.5.0',        # sysName
+        '1.3.6.1.2.1.1.6.0',        # sysLocation
+        '1.3.6.1.2.1.2.2.1.2.1',    # ifDescr.1
+        '1.3.6.1.2.1.2.2.1.10.1',   # ifInOctets.1
+        '1.3.6.1.2.1.2.2.1.16.1',   # ifOutOctets.1
+    ]
+
+    for oid in oids:
+        result = snmp_get(oid)
+        for k, v in result.items():
+            print(f'{k} = {v}')
+
+
+if __name__ == '__main__':
+    test_snmp_all()
