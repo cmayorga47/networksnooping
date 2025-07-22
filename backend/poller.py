@@ -3,8 +3,8 @@ import time
 
 def snmp_get(oid, target=('127.0.0.1', 1161), community='public', version=1):
     iterator = getCmd(
-        SnmpEngine('demo'),
-        CommunityData(community, mpModel=0 if version == 1 else 1),
+        SnmpEngine(),
+        CommunityData('demo'),
         UdpTransportTarget(target),
         ContextData(),
         ObjectType(ObjectIdentity(oid))
