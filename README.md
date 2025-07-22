@@ -1,4 +1,6 @@
 # networksnooping
 SNMP polling for local network with dashboard and live update
 
-Python (simplesnmp, flask) , sqlite, react.
+Python (snmpsim, flask) , sqlite, react(tsx)
+
+
